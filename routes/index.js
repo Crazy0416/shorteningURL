@@ -7,25 +7,26 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:subdomain', function(req, res, next){
-    var o_url = shorten.shortening(req.param.subdomain);
-    res.redirect(o_url);
+    var o_url = shorten.shortening("http://localhost/" + req.params.subdomain, function(n_url){
+        console.log(n_url);
+        res.redirect(n_url);
+    });
 })
 
 router.post('/short', function(req, res, next){
-    var n_url = shorten.shortening(req.body.o_url);
-    console.log("url : " + n_url);
-
-    if(n_url != null){
-        res.send({
-            "SUCCESS" : true,
-            "n_url" : n_url
-        });
-    }else {
-        res.statusCode(204);
-        res.send({
-            "SUCCESS" : false
-        })
-    }
+    shorten.shortening(req.body.o_url, function(n_url){
+        if(n_url != null){
+            res.send({
+                "SUCCESS" : true,
+                "n_url" : n_url
+            });
+        }else {
+            res.statusCode(204);
+            res.send({
+                "SUCCESS" : false
+            })
+        }
+    });
 })
 
 module.exports = router;
