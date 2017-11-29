@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  </head>
+  <body>
+    <div>바꿀 url : <br/><input type="text" id="msg" value=""></div>
+    <div>shortening : <br/><div id="n_url"></div></div>
+    <div><input type="button" id="ajax_url" value="submit"></div>
+    <script type="text/javascript">
+      $('#ajax_url').click(function(){
+          $('#n_url').html();
+          console.log('ok');
+          $.ajax({
+              'url':'/short',
+              'type':'POST',
+              'dataType':'json',
+              'data':{'o_url':$('#msg').val()},
+              'success':  function(result){
+                  if(result['SUCCESS'] == true){
+                      console.log(result['n_url']);
+                      $('#n_url').html("<a href= \"" + result['n_url'] +"\">" +result['n_url']+"</a>");
+                  }
+              }
+          })
+      })
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  </body>
+</html>
