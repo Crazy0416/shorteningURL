@@ -55,7 +55,7 @@ var fromBase62 = function(shorturl, callback){
     return -1;
 }
 
-var test = function(o_url, callback){
+exports.shortening = function(o_url, callback){
     var n_url = "";
     if(o_url.split('/')[2].indexOf("localhost") >= 0){  // mysql에 데이터 있음
         var shortUrl = o_url.split('/')[3];
@@ -80,22 +80,29 @@ var test = function(o_url, callback){
     }else{      // 새로 생성해야함
         var n_url;
         var base64arr = [];
+        mysql.query('SELECT o_url FROM url WHERE url_id=?')
         mysql.query('INSERT INTO url (o_url, visit_cnt) Values (?,?)', [o_url, 0])
             .then(function (rows) {
-                console.log('insertid : ' + rows[0].insertId);
+                console.log('insertId : ' + rows[0].insertId);
                 var urlcode = "";
                 toBase62(rows[0].insertId, base64arr, function () {
                     console.log('here : ' + base64arr);
                     base64arr.forEach(function(elem, index){
                         urlcode += table[elem];
                         if(index === base64arr.length - 1) {
-                            callback(urlcode);
+                            callback({
+                                "success": true,
+                                "data" : "http://localhost/" + urlcode
+                            });
                         }
                     })
                 });
             })
             .catch(function (err) {
-                console.log(err);
+                callback({
+                    "success": false,
+                    "data" : "DB_ERR"
+                });
             })
 /*
         changeURL(rbody['data']['url'], "localhost")
@@ -105,7 +112,3 @@ var test = function(o_url, callback){
 */
     };
 }
-
-test("http://localhost:3030/m", function(n_url){
-    console.log('n_url :' + n_url.data);
-})
