@@ -1,0 +1,111 @@
+var mysql = require('mysql-promise')();
+var request = require('request');
+BASE = 62;
+const table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+// config file
+var mysql_config = require('../config/db_config.json');
+// mysql config tab
+mysql.configure(mysql_config);
+
+var changeURL = function(data, host){
+    var n_url="";
+    return new Promise(function(callback){
+        data.split('/').forEach(function (elem, i, arr) {
+            if(i === arr.length - 1){   // end
+                n_url += (elem);
+                callback(n_url);
+            }
+            else if (i === 2)
+                n_url += (host + '/');
+            else
+                n_url += (elem + '/');
+
+        })
+    })
+}
+
+var toBase62 = function(id, base62Alg, callback){
+    var arr = base62Alg;
+    do{
+        var mod = Number(id % BASE);
+        console.log('mod : ' + mod);
+        arr.push(mod);
+        id = Math.floor(id / BASE);
+        console.log('id :' + id);
+        if(id === 0)
+            callback();
+    }while(id)
+}
+
+var fromBase62 = function(shorturl, callback){
+    var result = 0;
+    var pos = 0;
+    var mul = 1;
+    console.log("shorturl length : " + shorturl.length);
+    for(var i = 0; i < shorturl.length; i++)
+    {
+        pos = table.indexOf(shorturl[i]);
+        result += pos * mul;
+        mul *= BASE;
+        if(i === (shorturl.length - 1)){
+            callback(result);
+        }
+    }
+    return -1;
+}
+
+var test = function(o_url, callback){
+    var n_url = "";
+    if(o_url.split('/')[2].indexOf("localhost") >= 0){  // mysql에 데이터 있음
+        var shortUrl = o_url.split('/')[3];
+        fromBase62(shortUrl, function (index) {
+            mysql.query('SELECT o_url FROM url WHERE url_id=?', index)
+                .spread(function (rows) {
+                    var o_url = rows[0]['o_url'];
+                    console.log("o_url : " + o_url);
+                    callback({
+                        "success": true,
+                        "data" : o_url
+                    });
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    callback({
+                        "success": false,
+                        "data" : "DB_ERR"
+                    });
+                })
+        });
+    }else{      // 새로 생성해야함
+        var n_url;
+        var base64arr = [];
+        mysql.query('INSERT INTO url (o_url, visit_cnt) Values (?,?)', [o_url, 0])
+            .then(function (rows) {
+                console.log('insertid : ' + rows[0].insertId);
+                var urlcode = "";
+                toBase62(rows[0].insertId, base64arr, function () {
+                    console.log('here : ' + base64arr);
+                    base64arr.forEach(function(elem, index){
+                        urlcode += table[elem];
+                        if(index === base64arr.length - 1) {
+                            callback(urlcode);
+                        }
+                    })
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+/*
+        changeURL(rbody['data']['url'], "localhost")
+            .then(function(n_url){
+                callback(n_url);
+            })
+*/
+    };
+}
+
+test("http://localhost:3030/m", function(n_url){
+    console.log('n_url :' + n_url.data);
+})

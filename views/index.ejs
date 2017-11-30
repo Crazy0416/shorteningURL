@@ -11,7 +11,7 @@
     <div><input type="button" id="ajax_url" value="submit"></div>
     <script type="text/javascript">
       $('#ajax_url').click(function(){
-          $('#n_url').html();
+          $('#n_url').html("찾는 중입니다...");
           console.log('ok');
           $.ajax({
               'url':'/short',
