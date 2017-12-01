@@ -1,5 +1,5 @@
 var mysql = require('mysql-promise')();
-var ip = require('ip');
+var ip = require('../config/ip_config')
 BASE = 62;
 const table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -66,33 +66,34 @@ exports.visit = function(o_url){
 
 exports.shortening = function(o_url, callback){
     var n_url = "";
-    if(o_url.split('/')[2].indexOf(ip.address()) >= 0){  // mysql에 데이터 있음
+    if(o_url.split('/')[2].indexOf(ip['host']) >= 0){  // mysql에 데이터 있음
         var shortUrl = o_url.split('/')[3];
-        console.log('shorturl: ' + typeof(shortUrl) + " " + shortUrl.length)
-        if(typeof(shortUrl) === "undefined" || shortUrl.length === 0){
+        console.log('shorturl: ' + typeof(shortUrl) + " " + shortUrl.length + " " + shortUrl)
+        if(typeof(shortUrl) === "undefined" || shortUrl.length === 0 || shortUrl == "favicon.ico"){
             return callback({
                 "success": false,
                 "data" : "주소를 다시 입력하세요"
             });
+        }else{
+            fromBase62(shortUrl, function (index) {
+                mysql.query('SELECT o_url FROM url WHERE url_id=?', index)
+                    .spread(function (rows) {
+                        var o_url = rows[0]['o_url'];
+                        console.log("o_url : " + o_url);
+                        callback({
+                            "success": true,
+                            "data" : o_url
+                        });
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                        callback({
+                            "success": false,
+                            "data" : "DB_ERR"
+                        });
+                    })
+            });
         }
-        fromBase62(shortUrl, function (index) {
-            mysql.query('SELECT o_url FROM url WHERE url_id=?', index)
-                .spread(function (rows) {
-                    var o_url = rows[0]['o_url'];
-                    console.log("o_url : " + o_url);
-                    callback({
-                        "success": true,
-                        "data" : o_url
-                    });
-                })
-                .catch(function (err) {
-                    console.log(err);
-                    callback({
-                        "success": false,
-                        "data" : "DB_ERR"
-                    });
-                })
-        });
     }else{      // 새로 생성해야함
         var n_url;
         var base64arr = [];
@@ -130,13 +131,12 @@ exports.shortening = function(o_url, callback){
                             if(index === base64arr.length - 1) {
                                 callback({
                                     "success": true,
-                                    "data" : "http://" + ip.address() + "/" + urlcode
+                                    "data" : "http://" + ip['host'] + "/" + urlcode
                                 });
                             }
                         })
                     });
                 }
             })
-
     };
 }
