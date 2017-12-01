@@ -11,8 +11,8 @@
     <div><input type="button" id="ajax_url" value="submit"></div>
     <script type="text/javascript">
       $('#ajax_url').click(function(){
-          $('#n_url').html();
-          console.log('ok');
+          $('#n_url').html("찾는 중입니다...");
+          console.log('ajax');
           $.ajax({
               'url':'/short',
               'type':'POST',
@@ -22,6 +22,10 @@
                   if(result['SUCCESS'] == true){
                       console.log(result['n_url']);
                       $('#n_url').html("<a href= \"" + result['n_url'] +"\">" +result['n_url']+"</a>");
+                  }
+                  else{
+                      console.log(result);
+                      $('#n_url').html(result['n_url']);
                   }
               }
           })
