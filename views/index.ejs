@@ -21,11 +21,11 @@
               'success':  function(result){
                   if(result['SUCCESS'] == true){
                       console.log(result['n_url']);
-                      $('#n_url').html("<a href= \"" + result['n_url'] +"\">" +result['n_url']+"</a>");
+                      $('#n_url').html("<a href= \"" + result['MSG'] +"\">" +result['MSG']+"</a>");
                   }
                   else{
                       console.log(result);
-                      $('#n_url').html(result['n_url']);
+                      $('#n_url').html(result['MSG']);
                   }
               }
           })
