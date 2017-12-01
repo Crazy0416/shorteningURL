@@ -12,14 +12,18 @@ mysql.configure(mysql_config);
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'ShortUrl' });
 });
 
 router.get('/:subdomain', function(req, res, next){
     shortenAlg.shortening("http://" + ip.address() + "/" + req.params.subdomain, function(n_url){
         console.log("n_url : " + n_url['data']);
-        shortenAlg.visit(n_url['data']);
-        return res.redirect(n_url['data']);
+        if(n_url['success'] === false){
+            res.redirect('/');
+        }else{
+            shortenAlg.visit(n_url['data']);
+            return res.redirect(n_url['data']);
+        }
     });
 })
 
