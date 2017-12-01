@@ -27,7 +27,7 @@ exports.visit = function(o_url){
 *          2-2. DB에 없다면 DB에 넣고 생성한 short url 리턴
 * */
 exports.shortening = function(o_url, callback){
-    if(o_url.split('/')[2].indexOf(pri_ip.address()) >= 0){  // short url 이 들어왔을 때
+    if(o_url.split('/')[2].indexOf(pub_ip['host']) >= 0){  // short url 이 들어왔을 때
         var shortUrl = o_url.split('/')[3];
         console.log('POST /short shorturl: ' + typeof(shortUrl) + " " + shortUrl.length + " " + shortUrl);
         if(typeof(shortUrl) === "undefined" || shortUrl.length === 0){  // short index 오류
