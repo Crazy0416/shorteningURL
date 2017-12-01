@@ -1,5 +1,5 @@
 var mysql = require('mysql-promise')();
-var bitlyconf = require('../config/bitly_cofig.json');
+var bitlyconf = require('../config/bitly_config.json');
 var request = require('request');
 
 // config file
