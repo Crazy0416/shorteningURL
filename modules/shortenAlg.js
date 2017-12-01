@@ -1,5 +1,5 @@
 var mysql = require('mysql-promise')();
-var request = require('request');
+var ip = require('ip');
 BASE = 62;
 const table = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -42,7 +42,6 @@ var fromBase62 = function(shorturl, callback){
     var result = 0;
     var pos = 0;
     var mul = 1;
-    console.log("shorturl length : " + shorturl.length);
     for(var i = 0; i < shorturl.length; i++)
     {
         pos = table.indexOf(shorturl[i]);
@@ -55,10 +54,27 @@ var fromBase62 = function(shorturl, callback){
     return -1;
 }
 
+exports.visit = function(o_url){
+   mysql.query('UPDATE url SET visit_cnt=visit_cnt+1 WHERE o_url=?', o_url)
+       .spread(function() {
+           console.log("UPDATE ok");
+       })
+       .catch(function (err) {
+           console.log("DB_ERR visit_cnt++");
+       });
+}
+
 exports.shortening = function(o_url, callback){
     var n_url = "";
-    if(o_url.split('/')[2].indexOf("localhost") >= 0){  // mysql에 데이터 있음
+    if(o_url.split('/')[2].indexOf(ip.address()) >= 0){  // mysql에 데이터 있음
         var shortUrl = o_url.split('/')[3];
+        console.log('shorturl: ' + typeof(shortUrl) + " " + shortUrl.length)
+        if(typeof(shortUrl) === "undefined" || shortUrl.length === 0){
+            return callback({
+                "success": false,
+                "data" : "주소를 다시 입력하세요"
+            });
+        }
         fromBase62(shortUrl, function (index) {
             mysql.query('SELECT o_url FROM url WHERE url_id=?', index)
                 .spread(function (rows) {
@@ -80,35 +96,47 @@ exports.shortening = function(o_url, callback){
     }else{      // 새로 생성해야함
         var n_url;
         var base64arr = [];
-        mysql.query('SELECT o_url FROM url WHERE url_id=?')
-        mysql.query('INSERT INTO url (o_url, visit_cnt) Values (?,?)', [o_url, 0])
-            .then(function (rows) {
-                console.log('insertId : ' + rows[0].insertId);
-                var urlcode = "";
-                toBase62(rows[0].insertId, base64arr, function () {
-                    console.log('here : ' + base64arr);
-                    base64arr.forEach(function(elem, index){
-                        urlcode += table[elem];
-                        if(index === base64arr.length - 1) {
-                            callback({
-                                "success": true,
-                                "data" : "http://localhost/" + urlcode
+        mysql.query('SELECT * FROM url WHERE o_url=?', o_url)
+            .spread(function(rows){
+                if(rows.length === 0){      // DB에 값이 없을 때
+                    mysql.query('INSERT INTO url (o_url, visit_cnt) Values (?,?)', [o_url, 0])
+                        .then(function (rows) {
+                            console.log('insertId : ' + rows[0].insertId);
+                            var urlcode = "";
+                            toBase62(rows[0].insertId, base64arr, function () {
+                                base64arr.forEach(function(elem, index){
+                                    urlcode += table[elem];
+                                    if(index === base64arr.length - 1) {
+                                        callback({
+                                            "success": true,
+                                            "data" : "http://" + ip.address() + "/" + urlcode
+                                        });
+                                    }
+                                })
                             });
-                        }
-                    })
-                });
+                        })
+                        .catch(function (err) {
+                            callback({
+                                "success": false,
+                                "data" : "DB_ERR"
+                            });
+                        })
+                }
+                else{
+                    var urlcode = "";
+                    toBase62(rows[0]['url_id'], base64arr, function () {
+                        base64arr.forEach(function(elem, index){
+                            urlcode += table[elem];
+                            if(index === base64arr.length - 1) {
+                                callback({
+                                    "success": true,
+                                    "data" : "http://" + ip.address() + "/" + urlcode
+                                });
+                            }
+                        })
+                    });
+                }
             })
-            .catch(function (err) {
-                callback({
-                    "success": false,
-                    "data" : "DB_ERR"
-                });
-            })
-/*
-        changeURL(rbody['data']['url'], "localhost")
-            .then(function(n_url){
-                callback(n_url);
-            })
-*/
+
     };
 }
