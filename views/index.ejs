@@ -4,14 +4,22 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/index.css">
   </head>
   <body>
-    <div>바꿀 url : <br/><input type="text" id="msg" value=""></div>
-    <div>shortening : <br/>
-      <div id="n_url"></div>
-      <div id="visit_cnt"></div>
+  <div class="title"><h2>URL Shortening Service </h2></div>
+    <div class="container">
+      <input type="text" id="msg" value="">
+      <input type="button" id="ajax_url" value="submit" class="title">
     </div>
-    <div><input type="button" id="ajax_url" value="submit"></div>
+    <p>
+      <div class="container">
+        <div class="indent">shortening => </strong><br/>
+          <div id="n_url" class="indent"></div>
+          <div id="visit_cnt" class="indent"></div>
+        </div>
+      </div>
+    </p>
     <script type="text/javascript">
       $('#ajax_url').click(function(){
           $('#n_url').html("찾는 중입니다...");
@@ -25,7 +33,7 @@
                   if(result['SUCCESS'] == true){
                       console.log(result['n_url']);
                       $('#n_url').html("<a href= \"" + result['MSG'] +"\">" +result['MSG']+"</a>");
-                      $('#visit_cnt').html("visit cnt : " + result['VISIT_CNT']);
+                      $('#visit_cnt').html("방문 횟수 : " + result['VISIT_CNT']);
                   }
                   else{
                       console.log(result);
