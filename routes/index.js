@@ -27,7 +27,7 @@ router.get('/:subdomain', function(req, res, next){
     if(req.params.subdomain === "favicon.ico"){
         // favicon.ico 처리
         res.status(400);
-        res.send('favicon.ico');
+        res.send('no favicon.ico');
     }else{      // shortURL 처리
         shortenAlg.shortening("http://" + pub_ip['host'] + "/" + req.params.subdomain, function(resObj){
             console.log("n_url : " + resObj['MSG']);

@@ -54,7 +54,8 @@ exports.shortening = function(o_url, callback){
                             console.log("o_url : " + o_url);
                             callback({
                                 "SUCCESS": true,
-                                "MSG" : o_url
+                                "MSG" : o_url,
+                                "VISIT_CNT": rows[0][0]['visit_cnt']
                             });
                         }
                     })
@@ -83,7 +84,8 @@ exports.shortening = function(o_url, callback){
                                     if(index === base64arr.length - 1) {
                                         callback({
                                             "SUCCESS": true,
-                                            "MSG" : "http://" + pub_ip['host'] + "/" + urlcode
+                                            "MSG" : "http://" + pub_ip['host'] + "/" + urlcode,
+                                            "VISIT_CNT": rows[0][0]['visit_cnt']
                                         });
                                     }
                                 })
@@ -106,7 +108,8 @@ exports.shortening = function(o_url, callback){
                             if(index === base64arr.length - 1) {
                                 callback({
                                     "SUCCESS": true,
-                                    "MSG" : "http://" + pub_ip['host'] + "/" + urlcode
+                                    "MSG" : "http://" + pub_ip['host'] + "/" + urlcode,
+                                    "VISIT_CNT": rows[0][0]['visit_cnt']
                                 });
                             }
                         })

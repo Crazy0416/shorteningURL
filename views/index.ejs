@@ -7,7 +7,10 @@
   </head>
   <body>
     <div>바꿀 url : <br/><input type="text" id="msg" value=""></div>
-    <div>shortening : <br/><div id="n_url"></div></div>
+    <div>shortening : <br/>
+      <div id="n_url"></div>
+      <div id="visit_cnt"></div>
+    </div>
     <div><input type="button" id="ajax_url" value="submit"></div>
     <script type="text/javascript">
       $('#ajax_url').click(function(){
@@ -22,6 +25,7 @@
                   if(result['SUCCESS'] == true){
                       console.log(result['n_url']);
                       $('#n_url').html("<a href= \"" + result['MSG'] +"\">" +result['MSG']+"</a>");
+                      $('#visit_cnt').html("visit cnt : " + result['VISIT_CNT']);
                   }
                   else{
                       console.log(result);
