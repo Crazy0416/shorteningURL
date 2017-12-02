@@ -5,10 +5,8 @@ exports.toBase62 = function(id, base62Alg, callback){
     var arr = base62Alg;
     do{
         var mod = Number(id % BASE);
-        console.log('mod : ' + mod);
         arr.push(mod);
         id = Math.floor(id / BASE);
-        console.log('id :' + id);
         if(id === 0)
             callback();
     }while(id)
