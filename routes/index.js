@@ -3,6 +3,7 @@ var router = express.Router();
 var base62 = require('../modules/base62');
 var mysql = require('mysql-promise')();
 var pri_ip = require('ip')
+var pub_ip = require('../config/ip_config')
 var shorten = require('../modules/shorten')
 var shortenAlg = require('../modules/shortenAlg')
 
@@ -28,7 +29,7 @@ router.get('/:subdomain', function(req, res, next){
         res.status(400);
         res.send('favicon.ico');
     }else{      // shortURL 처리
-        shortenAlg.shortening("http://" + pri_ip.address() + "/" + req.params.subdomain, function(resObj){
+        shortenAlg.shortening("http://" + pub_ip['host'] + "/" + req.params.subdomain, function(resObj){
             console.log("n_url : " + resObj['MSG']);
             if(resObj['SUCCESS'] === false){
                 console.log("subdomain ERR : " + resObj['ERR']);
