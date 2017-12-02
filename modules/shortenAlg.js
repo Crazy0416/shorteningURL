@@ -40,7 +40,7 @@ exports.shortening = function(o_url, callback){
         else{
             base62.fromBase62(shortUrl, function (index) {
                 console.log("index : " + index)
-                mysql.query('SELECT o_url FROM url WHERE url_id=?', index)
+                mysql.query('SELECT * FROM url WHERE url_id=?', index)
                     .then(function (rows) {
                         console.log(rows);
                         if(rows[0].length === 0){    // DB에 short url을 가지는 o_url이 존재하지 않음
