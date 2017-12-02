@@ -73,6 +73,7 @@ exports.shortening = function(o_url, callback){
         var base64arr = [];
         mysql.query('SELECT * FROM url WHERE o_url=?', o_url)
             .then(function(rows){
+                console.log(rows);
                 if(rows[0].length === 0){      // DB에 값이 없을 때 DB에 값을 넣음
                     mysql.query('INSERT INTO url (o_url, visit_cnt) Values (?,?)', [o_url, 0])
                         .then(function (rows) {
@@ -85,14 +86,14 @@ exports.shortening = function(o_url, callback){
                                         callback({
                                             "SUCCESS": true,
                                             "MSG" : "http://" + pub_ip['host'] + "/" + urlcode,
-                                            "VISIT_CNT": rows[0][0]['visit_cnt']
+                                            "VISIT_CNT": 0
                                         });
                                     }
                                 })
                             });
                         })
                         .catch(function (err) {
-                            console.log("INSERT URL ERR: " + err);
+                            console.log("o_url :" + o_url + " / INSERT URL ERR: " + err);
                             callback({
                                 "SUCCESS": false,
                                 "MSG" : "DB INSERT 오류",
