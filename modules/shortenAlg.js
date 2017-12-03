@@ -27,8 +27,17 @@ exports.visit = function(o_url){
 *          2-2. DB에 없다면 DB에 넣고 생성한 short url 리턴
 * */
 exports.shortening = function(o_url, callback){
-    if(o_url.split('/')[2].indexOf(pub_ip['host']) >= 0){  // short url 이 들어왔을 때
-        var shortUrl = o_url.split('/')[3];
+    var url = o_url.split('/');
+    console.log(url.length);
+    if(url.length <= 2 || url[2] == ""){
+        console.log("/ 개수 : " + url.length)
+        callback({
+            "SUCCESS": false,
+            "MSG" : "정상적인 URL이 아닙니다.",
+            "ERR" : "WRONG_URL"
+        })
+    }else if(url[2].indexOf(pub_ip['host']) >= 0){  // short url 이 들어왔을 때
+        var shortUrl = url[3];
         console.log('POST /short shorturl: ' + typeof(shortUrl) + " " + shortUrl.length + " " + shortUrl);
         if(typeof(shortUrl) === "undefined" || shortUrl.length === 0){  // short index 오류
             callback({
