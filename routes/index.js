@@ -2,10 +2,9 @@ var express = require('express');
 var router = express.Router();
 var base62 = require('../modules/base62');
 var mysql = require('mysql-promise')();
-var pri_ip = require('ip')
-var pub_ip = require('../config/ip_config')
-var shorten = require('../modules/shorten')
-var shortenAlg = require('../modules/shortenAlg')
+var pub_ip = require('../config/ip_config');
+//var shorten = require('../modules/shorten');
+var shortenAlg = require('../modules/shortenAlg');
 
 // config file
 var mysql_config = require('../config/db_config.json');
@@ -41,7 +40,7 @@ router.get('/:subdomain', function(req, res, next){
             }
         });
     }
-})
+});
 
 /*
 * 기능 : shortenAlg 실행
@@ -50,6 +49,6 @@ router.post('/short', function(req, res, next){
     shortenAlg.shortening(req.body.o_url, function(resObj){
         res.send(resObj);
     });
-})
+});
 
 module.exports = router;
